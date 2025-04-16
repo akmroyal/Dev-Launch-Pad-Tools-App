@@ -29,7 +29,9 @@
 |------------------|----------------------------------------------------------|------------|
 | ✅ JSON Formatter | Beautify and minify JSON content                        | Completed  |
 | ✅ Color Picker   | Pick colors from image or manually with copy preview    | Completed  |
-| ✅ Markdown Editor| Rich markdown editing, copy/export supported            | In Progress|
+| ✅ Markdown Editor| Rich markdown editing, copy/export supported            | Completed  |
+| ✅ Text Generator | Generate the Text content with desired para/lines       | Completed  |
+| ✅ URL Encode/Decoder | Encode and Decode your url from your given url             | Completed  |
 | ⏳ ShipBattle Game| Real-time guessing game with grid + chat                | Upcoming   |
 | ⏳ Collab Notes   | Real-time collaborative editor with chat & sync         | Upcoming   |
 
