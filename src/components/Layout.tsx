@@ -4,15 +4,14 @@ import Footer from "./Footer.tsx";
 
 export default function Layout() {
     const location = useLocation();
-    const hiddenRoutesPath = ["/game/battleship"];
-    const isHiddenRoute = hiddenRoutesPath.includes(location.pathname);
-
+    // const hiddenRoutesPath = [`/game/battleship/:${roomID}`];
+    // const isHiddenRoute = hiddenRoutesPath.includes(location.pathname);
+    const isGameRoom = /^\/game\/battleship\/[^/]+$/.test(location.pathname);
     return (
         <>
-            {!isHiddenRoute || <Navbar />}
-            {/* <Navbar /> */}
+            {!isGameRoom && <Navbar />}
             <Outlet />
-            {!isHiddenRoute && <Footer />}
+            {!isGameRoom && <Footer />}
         </>
     );
 }
