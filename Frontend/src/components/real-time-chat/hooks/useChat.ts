@@ -1,174 +1,152 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react';
+import io, { Socket } from 'socket.io-client';
+import { Message } from '@/components/types';
 
-interface Message {
-  id: string
-  text: string
-  sender: string
-  timestamp: string
-  isLocal?: boolean
-}
+const getSocketUrl = () => {
+  return import.meta.env.MODE === 'development'
+    ? 'http://localhost:3001'
+    : 'https://your-socket-server.com';
+};
 
 interface ChatState {
-  messages: Message[]
-  isConnected: boolean
-  error: string | null
-  isConnecting: boolean
-}
-
-// Determine WebSocket URL based on environment
-const getWebSocketUrl = () => {
-  if (import.meta.env.MODE === 'development') {
-    return 'ws://localhost:8080'
-  }
-  // For production, you'll replace this with your actual WebSocket server URL
-  return 'wss://your-websocket-server.com'
+  messages: Message[];
+  isConnected: boolean;
+  error: string | null;
+  isConnecting: boolean;
 }
 
 export function useChat(roomId: string, username: string) {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [state, setState] = useState<ChatState>({
     messages: [],
     isConnected: false,
     error: null,
     isConnecting: false,
-  })
-  const socketRef = useRef<WebSocket | null>(null)
-  const reconnectAttempts = useRef(0)
-  const maxReconnectAttempts = 5
+  });
+
+  const [userCount, setUserCount] = useState(1); // ✅ new
 
   const addMessage = useCallback((message: Message) => {
     setState(prev => {
-      const updatedMessages = [...prev.messages, message]
-      
-      // Auto-delete old messages when we reach 100
-      if (updatedMessages.length > 100) {
-        updatedMessages.shift()
-      }
-      
-      return {
-        ...prev,
-        messages: updatedMessages
-      }
-    })
-  }, [])
-
-  const connect = useCallback(() => {
-    if (!roomId || state.isConnected || state.isConnecting) return
-
-    setState(prev => ({ ...prev, isConnecting: true, error: null }))
-    
-    const socketUrl = getWebSocketUrl()
-    const socket = new WebSocket(socketUrl)
-    socketRef.current = socket
-
-    socket.onopen = () => {
-      reconnectAttempts.current = 0
-      setState(prev => ({ 
-        ...prev, 
-        isConnected: true, 
-        isConnecting: false,
-        error: null 
-      }))
-      
-      // Join the room
-      socket.send(JSON.stringify({
-        type: 'join',
-        roomId,
-        username
-      }))
-    }
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        
-        if (data.type === 'message') {
-          addMessage({
-            ...data,
-            isLocal: false
-          })
-        }
-        else if (data.type === 'notification') {
-          addMessage({
-            id: Date.now().toString(),
-            text: data.text,
-            sender: 'System',
-            timestamp: new Date().toISOString(),
-            isLocal: false
-          })
-        }
-        else if (data.type === 'history') {
-          // Handle message history if implemented on server
-        }
-      } catch (error) {
-        console.error('Error parsing message:', error)
-      }
-    }
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error)
-      setState(prev => ({
-        ...prev,
-        isConnected: false,
-        isConnecting: false,
-        error: 'Connection error'
-      }))
-    }
-
-    socket.onclose = (event) => {
-      setState(prev => ({
-        ...prev,
-        isConnected: false,
-        isConnecting: false
-      }))
-      
-      // Attempt reconnection if this wasn't a normal closure
-      if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
-        reconnectAttempts.current += 1
-        const delay = Math.min(1000 * reconnectAttempts.current, 5000) // Exponential backoff max 5s
-        setTimeout(connect, delay)
-      }
-    }
-
-    return socket
-  }, [roomId, username, addMessage, state.isConnected, state.isConnecting])
+      const updatedMessages = [...prev.messages, message];
+      if (updatedMessages.length > 100) updatedMessages.shift();
+      return { ...prev, messages: updatedMessages };
+    });
+  }, []);
 
   useEffect(() => {
-    const socket = connect()
-    
-    return () => {
-      socket?.close()
-      socketRef.current = null
-    }
-  }, [connect])
+    if (!roomId) return;
 
-  const sendMessage = useCallback((text: string) => {
-    if (!text.trim() || !socketRef.current || !state.isConnected) return
+    setState(prev => ({ ...prev, isConnecting: true, error: null }));
 
-    const message = {
-      id: Date.now().toString(),
-      text,
-      sender: username,
-      timestamp: new Date().toISOString(),
-      isLocal: true
-    }
+    const socketInstance = io(getSocketUrl(), {
+      withCredentials: true,
+    });
 
-    // Optimistically add local message
-    addMessage(message)
+    setSocket(socketInstance);
 
-    // Send to server
-    try {
-      socketRef.current.send(JSON.stringify({
-        type: 'message',
-        text: message.text
-      }))
-    } catch (error) {
-      console.error('Error sending message:', error)
+    const handleConnect = () => {
       setState(prev => ({
         ...prev,
-        error: 'Failed to send message'
-      }))
+        isConnected: true,
+        isConnecting: false,
+        error: null
+      }));
+      socketInstance.emit('join_room', { roomId, username });
+    };
+
+    const handleDisconnect = () => {
+      setState(prev => ({ ...prev, isConnected: false, isConnecting: false }));
+    };
+
+    const handleReceiveMessage = (message: Message) => {
+      addMessage(message);
+    };
+
+    const handleUserJoined = ({ username: joinedUser }) => {
+      addMessage({
+        id: crypto.randomUUID(),
+        text: `${joinedUser} has joined the room`,
+        username: 'System',
+        sender: 'System',
+        isSystem: true,
+        timestamp: Date.now()
+      });
+    };
+
+    const handleUserLeft = ({ username: leftUser }) => {
+      addMessage({
+        id: crypto.randomUUID(),
+        text: `${leftUser} has left the room`,
+        username: 'System',
+        sender: 'System',
+        isSystem: true,
+        timestamp: Date.now()
+      });
+    };
+
+    const handleRoomData = (room) => {
+      setState(prev => ({ ...prev, messages: room.messages }));
+    };
+
+    const handleRoomUserCount = ({ count }: { count: number }) => {
+      setUserCount(count);
+    };
+
+    const handleConnectError = (err: any) => {
+      console.error('Connection error:', err);
+      setState(prev => ({
+        ...prev,
+        isConnected: false,
+        isConnecting: false,
+        error: 'Connection error: ' + err.message
+      }));
+    };
+
+    socketInstance.on('connect', handleConnect);
+    socketInstance.on('disconnect', handleDisconnect);
+    socketInstance.on('receive_message', handleReceiveMessage);
+    socketInstance.on('user_joined', handleUserJoined);
+    socketInstance.on('user_left', handleUserLeft);
+    socketInstance.on('room_data', handleRoomData);
+    socketInstance.on('room_user_count', handleRoomUserCount);
+    socketInstance.on('connect_error', handleConnectError);
+
+    return () => {
+      socketInstance.emit('leave_room', { roomId, username });
+      socketInstance.disconnect();
+      socketInstance.off('connect', handleConnect);
+      socketInstance.off('disconnect', handleDisconnect);
+      socketInstance.off('receive_message', handleReceiveMessage);
+      socketInstance.off('user_joined', handleUserJoined);
+      socketInstance.off('user_left', handleUserLeft);
+      socketInstance.off('room_data', handleRoomData);
+      socketInstance.off('room_user_count', handleRoomUserCount);
+      socketInstance.off('connect_error', handleConnectError);
+    };
+  }, [roomId, username, addMessage]);
+
+  const sendMessage = useCallback((text: string) => {
+    if (!text.trim() || !socket || !state.isConnected) return;
+
+    const message: Message = {
+      id: crypto.randomUUID(),
+      text,
+      username,
+      sender: username,
+      isSystem: false,
+      timestamp: Date.now()
+    };
+
+    socket.emit('send_message', { roomId, message });
+    addMessage({ ...message, isLocal: true }); // show instantly
+  }, [socket, state.isConnected, roomId, username, addMessage]);
+
+  const reconnect = useCallback(() => {
+    if (socket) {
+      socket.connect();
     }
-  }, [username, addMessage, state.isConnected])
+  }, [socket]);
 
   return {
     messages: state.messages,
@@ -176,6 +154,7 @@ export function useChat(roomId: string, username: string) {
     isConnected: state.isConnected,
     isConnecting: state.isConnecting,
     error: state.error,
-    reconnect: connect,
-  }
+    reconnect,
+    userCount,
+  };
 }
