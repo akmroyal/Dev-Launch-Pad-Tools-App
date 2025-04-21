@@ -2,11 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { Message } from '@/components/types';
 
-const getSocketUrl = () => {
-  return import.meta.env.MODE === 'development'
-    ? 'http://localhost:3001'
-    : 'https://your-socket-server.com';
-};
+
 
 interface ChatState {
   messages: Message[];
@@ -14,6 +10,12 @@ interface ChatState {
   error: string | null;
   isConnecting: boolean;
 }
+const projectStatus = 'development';
+export const getSocketUrl = () => {
+  return projectStatus === 'development'
+    ? 'http://localhost:3001'
+    : 'https://your-socket-server.com';
+};
 
 export function useChat(roomId: string, username: string) {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -147,7 +149,7 @@ export function useChat(roomId: string, username: string) {
       socket.connect();
     }
   }, [socket]);
-
+  
   return {
     messages: state.messages,
     sendMessage,
@@ -156,5 +158,6 @@ export function useChat(roomId: string, username: string) {
     error: state.error,
     reconnect,
     userCount,
+    // getSocketUrl,
   };
 }

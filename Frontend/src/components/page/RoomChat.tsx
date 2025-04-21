@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import io from "socket.io-client";
+import { getSocketUrl } from "@/components/real-time-chat/hooks/useChat";
 
 export default function RoomChat() {
     const [roomId, setRoomId] = useState("");
@@ -12,7 +13,7 @@ export default function RoomChat() {
     // ✅ Function to check if room exists using temporary socket
     const checkIfRoomExists = (roomId: string): Promise<boolean> => {
         return new Promise((resolve) => {
-            const tempSocket = io("http://localhost:3001", {
+            const tempSocket = io(getSocketUrl(), {
                 forceNew: true,
                 reconnection: false,
             });
@@ -52,7 +53,7 @@ export default function RoomChat() {
             exist = await checkIfRoomExists(newRoomId);
         }
 
-        const socket = io("http://localhost:3001", {
+        const socket = io(getSocketUrl(), {
             forceNew: true,
             reconnection: false,
         });
