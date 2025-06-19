@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import io from "socket.io-client";
-import { getSocketUrl } from "@/components/real-time-chat/hooks/useChat";
+import { getSocketUrl } from "../../lib/index";
 
 export default function RoomChat() {
     const [roomId, setRoomId] = useState("");

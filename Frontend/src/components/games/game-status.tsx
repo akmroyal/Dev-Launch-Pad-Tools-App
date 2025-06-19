@@ -23,7 +23,7 @@ export default function GameStatus({
 }: GameStatusProps) {
     const getStatusMessage = () => {
         if (gamePhase === "waiting") {
-            return "Waiting for an opponent to join... Share your room code!"
+            return "Wainting for an opponent to join... Share your room code!"
         }
 
         if (gamePhase === "preparation") {

@@ -35,7 +35,7 @@ const Footer = () => {
                         </MenubarMenu>
                         <MenubarMenu>
                             <MenubarTrigger>
-                                <a href="https://github.com/akmroyal" target="_blank" className="flex items-center justify-between gap-2 text-2xl">
+                                <a href="https://github.com/akmroyal/Dev-Launch-Pad-Tools-App" target="_blank" className="flex items-center justify-between gap-2 text-2xl">
                                     Source Code
                                     <span><SiGithub /></span>
                                 </a>

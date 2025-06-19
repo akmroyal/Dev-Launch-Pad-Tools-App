@@ -8,6 +8,8 @@ import Layout from './components/Layout.tsx'
 import GameInterface from './components/games/[roomId]/gameInterface.tsx'
 import RoomChat from './components/page/RoomChat.tsx'
 import ChatRoom from './components/real-time-chat/ChatRoom.tsx'
+import { Toaster } from 'sonner'
+
 
 
 createRoot(document.getElementById('root')!).render(
@@ -22,16 +24,6 @@ createRoot(document.getElementById('root')!).render(
       <Route path='/games/battleship/:roomId' element={<GameInterface />} />
       <Route path='/games/roomchat/:roomId' element={<ChatRoom />} />
     </Routes>
+    <Toaster position="top-right" richColors />
   </BrowserRouter>
 )
-
-// <BrowserRouter>
-//   <Navbar />
-//   <Routes>
-//     <Route path="/" element={<App />} />
-//     <Route path="/tool/:id" element={<ToolsPage />} />
-//     <Route path='/games/battleship' element={<BattleShipsGame />} />
-//     {/* <Route path="/game/:gamename" element={<}/> */}
-//   </Routes>
-//   <Footer />
-// </BrowserRouter>

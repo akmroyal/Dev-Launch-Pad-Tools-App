@@ -3,6 +3,7 @@ import type React from "react"
 import { useState } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import {
     Dialog,
     DialogContent,
@@ -14,20 +15,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-// import { useToast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router"
-// import { useRouter } from "next/navigation"
 
 export default function CreateRoomModal({ children }: { children: React.ReactNode }) {
     const [roomId, setRoomId] = useState("")
     const [playerName, setPlayerName] = useState("")
     const [copied, setCopied] = useState(false)
     const [open, setOpen] = useState(false)
-    // const { toast } = useToast()
     const navigate = useNavigate();
 
     const generateRoomId = () => {
-        // Generate a random 6-character alphanumeric room ID
         const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         let result = ""
         for (let i = 0; i < 6; i++) {
@@ -39,46 +36,36 @@ export default function CreateRoomModal({ children }: { children: React.ReactNod
     const copyToClipboard = () => {
         navigator.clipboard.writeText(roomId)
         setCopied(true)
-        // toast({
-        //     title: "Room ID copied!",
-        //     description: "Share this with your opponent to start the battle.",
-        // })
+
+        toast.success("Room ID copied to clipboard!", {
+            description: "Share this with your opponent to start the battle.",
+        })
+
         setTimeout(() => setCopied(false), 2000)
     }
 
     const handleCreateRoom = () => {
         if (!playerName.trim()) {
-            // toast({
-            //     title: "Name required",
-            //     description: "Please enter your name to create a room.",
-            //     variant: "destructive",
-            // })
+            toast.error("Name required", {
+                description: "Please enter your name to create a room.",
+            })
             return
         }
 
-        // Store created room in localStorage
-        const storedRooms = localStorage.getItem("createdRooms")
-        const rooms = storedRooms ? JSON.parse(storedRooms) : []
-        localStorage.setItem("createdRooms", JSON.stringify([...rooms, roomId]))
+        // const storedRooms = localStorage.getItem("createdRooms")
+        // const rooms = storedRooms ? JSON.parse(storedRooms) : []
+        // localStorage.setItem("createdRooms", JSON.stringify([...rooms, roomId]))
 
-        // Store player name
-        localStorage.setItem(`player_${roomId}`, playerName)
+        // localStorage.setItem(`player_${roomId}`, playerName)
 
-        // Navigate to game room
-        // navigate(`/games/${roomId}`)
-        navigate(`/games/battleship/${roomId}`)
-
+        navigate(`/games/battleship/${roomId}`, { state: { username: playerName } })
         setOpen(false)
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <div
-                    onClick={() => {
-                        generateRoomId()
-                    }}
-                >
+                <div onClick={() => generateRoomId()}>
                     {children}
                 </div>
             </DialogTrigger>
@@ -91,9 +78,7 @@ export default function CreateRoomModal({ children }: { children: React.ReactNod
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="roomId" className="text-gray-100">
-                            Room ID
-                        </Label>
+                        <Label htmlFor="roomId" className="text-gray-100">Room ID</Label>
                         <div className="flex items-center gap-2">
                             <Input id="roomId" value={roomId} readOnly className="bg-gray-900/50 border-gray-700 text-gray-100" />
                             <Button
@@ -106,9 +91,7 @@ export default function CreateRoomModal({ children }: { children: React.ReactNod
                         </div>
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="playerName" className="text-gray-100">
-                            Your Name
-                        </Label>
+                        <Label htmlFor="playerName" className="text-gray-100">Your Name</Label>
                         <Input
                             id="playerName"
                             value={playerName}
@@ -121,7 +104,7 @@ export default function CreateRoomModal({ children }: { children: React.ReactNod
                 <DialogFooter className="sm:justify-between">
                     <Button
                         className="border-gray-700 text-gray-200 hover:bg-gray-800 hover:text-gray-100 cursor-pointer"
-                        onClick={() => generateRoomId()}
+                        onClick={generateRoomId}
                     >
                         Generate New ID
                     </Button>
@@ -129,7 +112,7 @@ export default function CreateRoomModal({ children }: { children: React.ReactNod
                         className="bg-yellow-500 hover:bg-yellow-400 text-gray-950 font-bold transition-all duration-300 cursor-pointer"
                         onClick={handleCreateRoom}
                     >
-                        Create & Join Room
+                        Create Room
                     </Button>
                 </DialogFooter>
             </DialogContent>

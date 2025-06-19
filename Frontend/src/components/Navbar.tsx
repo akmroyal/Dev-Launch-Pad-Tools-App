@@ -48,7 +48,7 @@ export default function MenubarDemo() {
           <MenubarMenu>
             <MenubarTrigger>
               <a
-                href="https://github.com/akmroyal"
+                href="https://github.com/akmroyal/Dev-Launch-Pad-Tools-App"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2"
@@ -67,7 +67,7 @@ export default function MenubarDemo() {
           <a href="/#tools" className="cursor-pointer">Get Tools</a>
           <a href="/#about" className="cursor-pointer">About</a>
           <a
-            href="https://github.com/akmroyal"
+            href="https://github.com/akmroyal/Dev-Launch-Pad-Tools-App"
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-2"

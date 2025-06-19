@@ -142,3 +142,27 @@ body{
   display: inline-block;
   transform: rotate(-45deg);
 }
+
+
+/* Custom Ship Size on Lobby */
+/* "carrier", "battleship", "cruiser", "submarine", "destroyer" */
+.ship-carrier{
+  width: 12rem;
+  height: 3rem;
+}
+.ship-battleship{
+  width: 8rem;
+  height: 3rem;
+}
+.ship-cruiser{
+  width: 7rem;
+  height: 3rem;
+}
+.ship-destroyer{
+  width: 6rem;
+  height: 3rem;
+}
+.ship-submarine{
+  width: 4rem;
+  height: 3rem;
+}

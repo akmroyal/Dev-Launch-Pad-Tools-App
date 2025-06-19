@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-// import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 type WaitingRoomProps = {
     roomId: string
@@ -10,7 +10,6 @@ type WaitingRoomProps = {
 
 export default function WaitingRoom({ roomId, onPartnerJoin }: WaitingRoomProps) {
     const [copied, setCopied] = useState(false)
-    // const { toast } = useToast()
 
     // Store created room in localStorage
     useEffect(() => {
@@ -25,10 +24,9 @@ export default function WaitingRoom({ roomId, onPartnerJoin }: WaitingRoomProps)
     const copyToClipboard = () => {
         navigator.clipboard.writeText(roomId)
         setCopied(true)
-        // toast({
-        //     title: "Room ID copied!",
-        //     description: "Share this with your opponent to start the battle.",
-        // })
+        toast.success("Room ID copied to clipboard!", {
+            description: "Share this with your opponent to start the battle.",
+        })
         setTimeout(() => setCopied(false), 2000)
     }
 
@@ -58,7 +56,7 @@ export default function WaitingRoom({ roomId, onPartnerJoin }: WaitingRoomProps)
                         <Button
                             size="icon"
                             variant="outline"
-                            className="border-gray-700 hover:bg-gray-800 hover:text-yellow-300 transition-all duration-300"
+                            className="bg-transparent border-gray-700 hover:bg-gray-800 hover:text-yellow-300 transition-all duration-300 cursor-pointer"
                             onClick={copyToClipboard}
                         >
                             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}

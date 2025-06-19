@@ -1,7 +1,14 @@
 import React from "react"
 import { useState, useEffect, useRef } from "react"
 import { RotateCw } from "lucide-react"
-import type { Ship, ShipType, Player } from "@/lib/game-types"
+import type { Ship, ShipType, Player } from "@/lib/index"
+
+// Image Upload : 
+import Ship1 from "@/assets/GameResrc/ship2.png"
+import Ship2 from "@/assets/GameResrc/ship3.png"
+import Ship3 from "@/assets/GameResrc/ship4.png"
+import Ship4 from "@/assets/GameResrc/ship5.png"
+import Ship5 from "@/assets/GameResrc/ship6.png"
 
 type GameBoardProps = {
   isPlacementPhase?: boolean
@@ -50,11 +57,11 @@ export default function GameBoard({
   }
 
   const shipImages: Record<ShipType, string> = {
-    carrier: "/placeholder.svg?height=50&width=250",
-    battleship: "/placeholder.svg?height=50&width=200",
-    cruiser: "/placeholder.svg?height=50&width=150",
-    submarine: "/placeholder.svg?height=50&width=150",
-    destroyer: "/placeholder.svg?height=50&width=100",
+    carrier: Ship2,
+    battleship: Ship3,
+    cruiser: Ship4,
+    submarine: Ship5,
+    destroyer: Ship1,
   }
 
   useEffect(() => {
@@ -335,20 +342,28 @@ export default function GameBoard({
             {getAvailableShips().map((shipType) => (
               <div
                 key={shipType}
-                className={`px-3 py-2 rounded-md text-sm bg-gray-800 text-gray-100 hover:bg-gray-700 cursor-grab flex items-center gap-2 ${selectedShipType === shipType ? "ring-2 ring-yellow-400" : ""
-                  }`}
+                className={`px-3 py-2 rounded-md text-sm text-gray-100 hover:opacity-60 cursor-grab flex items-center gap-2 ${selectedShipType === shipType ? "ring-2 ring-yellow-400" : ""
+                  } ship-${shipType}`}
                 onClick={() => setSelectedShipType(shipType)}
                 draggable
+                style={
+                  {
+                    backgroundImage : `url('${shipImages[shipType]}')`,
+                    backgroundSize: "cover",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center"
+                  }
+                }
                 onDragStart={(e) => handleDragStart(e, shipType)}
               >
                 <div
-                  className="bg-yellow-500 rounded-sm"
+                  className=""
                   style={{
                     width: `${shipSizes[shipType] * 15}px`,
                     height: "15px",
                   }}
                 ></div>
-                {shipType.charAt(0).toUpperCase() + shipType.slice(1)} ({shipSizes[shipType]})
+                {/* {shipType.charAt(0).toUpperCase() + shipType.slice(1)} ({shipSizes[shipType]}) */}
               </div>
             ))}
           </div>
@@ -357,8 +372,8 @@ export default function GameBoard({
             <div className="flex gap-4 mb-4">
               <button
                 className={`px-3 py-1 rounded-md text-sm ${selectedOrientation === "horizontal"
-                    ? "bg-yellow-500 text-gray-950"
-                    : "bg-gray-800 text-gray-100 hover:bg-gray-700"
+                  ? "bg-yellow-500 text-gray-950"
+                  : "bg-gray-800 text-gray-100 hover:bg-gray-700"
                   }`}
                 onClick={() => setSelectedOrientation("horizontal")}
               >
@@ -366,8 +381,8 @@ export default function GameBoard({
               </button>
               <button
                 className={`px-3 py-1 rounded-md text-sm ${selectedOrientation === "vertical"
-                    ? "bg-yellow-500 text-gray-950"
-                    : "bg-gray-800 text-gray-100 hover:bg-gray-700"
+                  ? "bg-yellow-500 text-gray-950"
+                  : "bg-gray-800 text-gray-100 hover:bg-gray-700"
                   }`}
                 onClick={() => setSelectedOrientation("vertical")}
               >
@@ -378,7 +393,7 @@ export default function GameBoard({
         </div>
       )}
 
-      <div className="grid grid-cols-11 gap-1" ref={boardRef}>
+      <div className="grid grid-cols-11" ref={boardRef}>
         {/* Column headers */}
         <div className="w-[30px] h-[30px]"></div>
         {cols.map((col) => (
