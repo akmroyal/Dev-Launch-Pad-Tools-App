@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 const app = express();
 const server = http.createServer(app);
 dotenv.config();
+import type { JoinRoomData, SendMessageData, PlayerReadyData, GuessData, ResultData, GameOverData, RoomOnly } from "./type.ts";
 const io = new Server(server, {
   cors: {
     origin: process.env.Frontend_URL, // 👈 change if your frontend runs elsewhere
@@ -61,7 +62,8 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("room_user_count", { count });
   };
 
-  socket.on("join_room", ({ roomId, username }) => {
+  socket.on("join_room", (data: JoinRoomData) => {
+    const { roomId, username } = data;
     if (!roomId || !username) return;
     socket.join(roomId);
     console.log(`${username} joined room: ${roomId}`);
@@ -69,11 +71,13 @@ io.on("connection", (socket) => {
     emitUserCount(roomId);
   });
 
-  socket.on("send_message", ({ roomId, message }) => {
+  socket.on("send_message", (data: SendMessageData) => {
+    const { roomId, message } = data;
     socket.to(roomId).emit("receive_message", message);
   });
 
-  socket.on("leave_room", ({ roomId, username }) => {
+  socket.on("leave_room", (data: JoinRoomData) => {
+    const { roomId, username } = data;
     socket.leave(roomId);
     socket.to(roomId).emit("user_left", { username });
     emitUserCount(roomId);
@@ -109,7 +113,8 @@ io.on("connection", (socket) => {
   });
 
   // Game-related events
-  socket.on("join_game_room", ({ roomId }) => {
+  socket.on("join_game_room", (data: RoomOnly) => {
+    const { roomId } = data;
     socket.join(roomId);
     const players = roomData.get(roomId) || [];
 
@@ -127,7 +132,8 @@ io.on("connection", (socket) => {
     console.log(`User ${socket.id} joined room: ${roomId}`);
   });
 
-  socket.on("player_ready", ({ roomId, ships }) => {
+  socket.on("player_ready", (data: PlayerReadyData) => {
+    const { roomId, ships } = data;
     socket.to(roomId).emit("opponent_ready");
 
     // Optional: Store ships to start game when both ready
@@ -147,20 +153,24 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("send_guess", ({ roomId, coordinate }) => {
+  socket.on("send_guess", (data: GuessData) => {
+    const { roomId, coordinate } = data;
     socket.to(roomId).emit("receive_guess", { coordinate });
   });
 
-  socket.on("send_result", ({ roomId, result }) => {
+  socket.on("send_result", (data: ResultData) => {
+    const { roomId, result } = data;
     socket.to(roomId).emit("receive_result", result);
   });
 
-  socket.on("game_over", ({ roomId, winner }) => {
+  socket.on("game_over", (data: GameOverData) => {
+    const { roomId, winner } = data;
     io.to(roomId).emit("game_over", { winner });
   });
 
   // Chat Messaging
-  // socket.on("send_message", ({ roomId, message }) => {
+  // socket.on("send_message", (data: SendMessageData) => {
+  //   const { roomId, message } = data;
   //   socket.to(roomId).emit("receive_message", message);
   // });
 
