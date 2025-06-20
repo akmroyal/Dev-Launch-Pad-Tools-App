@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import io, { Socket } from 'socket.io-client';
-import { Message } from '@/components/types';
-
-
+import { Message } from '@/lib/index';
+import socket from '@/lib/socket';
 
 interface ChatState {
   messages: Message[];
@@ -10,15 +8,8 @@ interface ChatState {
   error: string | null;
   isConnecting: boolean;
 }
-const projectStatus = 'development';
-export const getSocketUrl = () => {
-  return projectStatus === 'development'
-    ? 'http://localhost:3001'
-    : 'https://your-socket-server.com';
-};
 
 export function useChat(roomId: string, username: string) {
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [state, setState] = useState<ChatState>({
     messages: [],
     isConnected: false,
@@ -40,12 +31,7 @@ export function useChat(roomId: string, username: string) {
     if (!roomId) return;
 
     setState(prev => ({ ...prev, isConnecting: true, error: null }));
-
-    const socketInstance = io(getSocketUrl(), {
-      withCredentials: true,
-    });
-
-    setSocket(socketInstance);
+    socket.connect();
 
     const handleConnect = () => {
       setState(prev => ({
@@ -54,7 +40,7 @@ export function useChat(roomId: string, username: string) {
         isConnecting: false,
         error: null
       }));
-      socketInstance.emit('join_room', { roomId, username });
+      socket.emit('join_room', { roomId, username });
     };
 
     const handleDisconnect = () => {
@@ -105,26 +91,26 @@ export function useChat(roomId: string, username: string) {
       }));
     };
 
-    socketInstance.on('connect', handleConnect);
-    socketInstance.on('disconnect', handleDisconnect);
-    socketInstance.on('receive_message', handleReceiveMessage);
-    socketInstance.on('user_joined', handleUserJoined);
-    socketInstance.on('user_left', handleUserLeft);
-    socketInstance.on('room_data', handleRoomData);
-    socketInstance.on('room_user_count', handleRoomUserCount);
-    socketInstance.on('connect_error', handleConnectError);
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('receive_message', handleReceiveMessage);
+    socket.on('user_joined', handleUserJoined);
+    socket.on('user_left', handleUserLeft);
+    socket.on('room_data', handleRoomData);
+    socket.on('room_user_count', handleRoomUserCount);
+    socket.on('connect_error', handleConnectError);
 
     return () => {
-      socketInstance.emit('leave_room', { roomId, username });
-      socketInstance.disconnect();
-      socketInstance.off('connect', handleConnect);
-      socketInstance.off('disconnect', handleDisconnect);
-      socketInstance.off('receive_message', handleReceiveMessage);
-      socketInstance.off('user_joined', handleUserJoined);
-      socketInstance.off('user_left', handleUserLeft);
-      socketInstance.off('room_data', handleRoomData);
-      socketInstance.off('room_user_count', handleRoomUserCount);
-      socketInstance.off('connect_error', handleConnectError);
+      socket.emit('leave_room', { roomId, username });
+      socket.disconnect();
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('receive_message', handleReceiveMessage);
+      socket.off('user_joined', handleUserJoined);
+      socket.off('user_left', handleUserLeft);
+      socket.off('room_data', handleRoomData);
+      socket.off('room_user_count', handleRoomUserCount);
+      socket.off('connect_error', handleConnectError);
     };
   }, [roomId, username, addMessage]);
 
@@ -141,7 +127,7 @@ export function useChat(roomId: string, username: string) {
     };
 
     socket.emit('send_message', { roomId, message });
-    addMessage({ ...message, isLocal: true }); // show instantly
+    addMessage({ ...message, isLocal: true });
   }, [socket, state.isConnected, roomId, username, addMessage]);
 
   const reconnect = useCallback(() => {
@@ -149,7 +135,6 @@ export function useChat(roomId: string, username: string) {
       socket.connect();
     }
   }, [socket]);
-  
   return {
     messages: state.messages,
     sendMessage,
@@ -158,6 +143,5 @@ export function useChat(roomId: string, username: string) {
     error: state.error,
     reconnect,
     userCount,
-    // getSocketUrl,
   };
 }
