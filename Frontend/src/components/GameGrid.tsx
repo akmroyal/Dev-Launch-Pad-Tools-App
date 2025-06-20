@@ -6,22 +6,25 @@ import { useNavigate } from "react-router";
 
 // Resources of the game
 import shipbattle from "../assets/GameResrc/BattleShip.jpg"
+import roomchat from "../assets/chat-app.jpeg"
 
 const games = [
     {
-        pagename: "waterbattle",
+        pagename: "battleship",
         title: "Battle of Water : Survival",
         genre: "Battle Royale",
         description: "This is a water battle game where you have to guess the ships position and just blast them first.",
-        platform: "PlayStation 5",
+        platform: "Play Now",
+        image: shipbattle,
     },
-    // {
-    //     title: "Valorant",
-    //     genre: "FPS",
-    //     platform: "PC",
-    //     image:
-    //         "https://cdn.cloudflare.steamstatic.com/steam/apps/1481520/header.jpg",
-    // },
+    {
+        pagename: "roomchat",
+        title: "Real time room chat : Chat",
+        genre: "Room Chat Application",
+        description: "This is a room chat application where you can chat with your partner in your space/room.",
+        platform: "Chat Now",
+        image: roomchat,
+    },
     // {
     //     title: "Elden Ring",
     //     genre: "RPG",
@@ -79,19 +82,19 @@ export default function GameGrid() {
                     >
                         <Card className="bg-slate-800 border border-slate-600 shadow-lg hover:scale-[1.02] transition-all duration-200">
                             <img
-                                src={shipbattle}
+                                src={game.image}
                                 alt={game.title}
                                 className="rounded-t-lg w-full h-40 object-cover"
                             />
                             <CardContent className="p-4">
                                 <h3 className="text-2xl font-bold mb-1 text-gray-300">{game.title}</h3>
                                 <p className="text-xl text-gray-400 mb-2 ">{game.description}</p>
-                                <div>
+                                <div className="">
                                     <Badge variant="outline" className="text-md text-gray-400 font-bold">
                                         {game.genre}
                                     </Badge>
-                                    <Badge variant="secondary" className="cursor-pointer text-md font-bold text-gray-900 ml-2 hover:bg-gray-600 focus:bg-gray-600 hover:text-gray-300 focus:text-gray-300" onClick={() => navigate("/games/battleship")}>
-                                        Play Now
+                                    <Badge variant="secondary" className="cursor-pointer text-md font-bold text-gray-900 ml-2 hover:bg-gray-600 focus:bg-gray-600 hover:text-gray-300 focus:text-gray-300" onClick={() => navigate(`/games/${game.pagename}`)}>
+                                        {game.platform}
                                     </Badge>
                                 </div>
                             </CardContent>
