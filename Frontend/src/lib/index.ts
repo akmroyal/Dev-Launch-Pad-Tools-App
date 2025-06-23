@@ -2,9 +2,10 @@ export type Message = {
   id: string;
   text: string;
   sender: string;
-  timestamp: string;
+  timestamp: number;
   isSystem?: boolean;
   isLocal?: boolean;
+  username?: string;
 };
 
 export type Room = {
@@ -31,7 +32,7 @@ const projectStatus = 'development';
 export const getSocketUrl = () => {
   return projectStatus === 'development'
     ? 'http://localhost:3001'
-    : 'https://your-socket-server.com';
+    : 'https://dev-launchpad-tools-game-app.onrender.com/';
 };
 
 

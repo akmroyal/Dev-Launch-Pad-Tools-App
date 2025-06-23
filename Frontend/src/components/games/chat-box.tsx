@@ -28,7 +28,7 @@ export default function ChatBox({ roomId, playerName, opponentName, disabled = f
         isConnecting,
         error,
         reconnect,
-        userCount,
+        // userCount,
     } = useChat(roomId, username)
 
     const handleSendMessage = () => {

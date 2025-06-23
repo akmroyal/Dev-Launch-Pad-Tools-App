@@ -51,7 +51,7 @@ export function useChat(roomId: string, username: string) {
       addMessage(message);
     };
 
-    const handleUserJoined = ({ username: joinedUser }) => {
+    const handleUserJoined = ({ username: joinedUser }: { username: string }) => {
       addMessage({
         id: crypto.randomUUID(),
         text: `${joinedUser} has joined the room`,
@@ -62,7 +62,7 @@ export function useChat(roomId: string, username: string) {
       });
     };
 
-    const handleUserLeft = ({ username: leftUser }) => {
+    const handleUserLeft = ({ username: leftUser }: { username: string }) => {
       addMessage({
         id: crypto.randomUUID(),
         text: `${leftUser} has left the room`,
@@ -73,7 +73,7 @@ export function useChat(roomId: string, username: string) {
       });
     };
 
-    const handleRoomData = (room) => {
+    const handleRoomData = (room: { messages: Message[] }) => {
       setState(prev => ({ ...prev, messages: room.messages }));
     };
 
@@ -81,7 +81,7 @@ export function useChat(roomId: string, username: string) {
       setUserCount(count);
     };
 
-    const handleConnectError = (err: any) => {
+    const handleConnectError = (err: Error) => {
       console.error('Connection error:', err);
       setState(prev => ({
         ...prev,

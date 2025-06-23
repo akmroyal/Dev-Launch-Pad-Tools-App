@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { getSocketUrl } from "@/lib";
+import { getSocketUrl } from "@/lib/index";
 
 // Global Socket instance of Client side : 
 const socket = io(getSocketUrl(), {

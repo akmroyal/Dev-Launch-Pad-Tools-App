@@ -1,4 +1,4 @@
-import type { Player, GamePhase } from "@/lib/game-types"
+import type { Player, GamePhase } from "@/lib/index"
 
 type GameStatusProps = {
     gamePhase: GamePhase
