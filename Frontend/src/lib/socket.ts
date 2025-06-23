@@ -4,6 +4,7 @@ import { getSocketUrl } from "@/lib/index";
 // Global Socket instance of Client side : 
 const socket = io(getSocketUrl(), {
     // withCredentials: true,
+    transports: ['websocket'],
     autoConnect: false,
 })
 
