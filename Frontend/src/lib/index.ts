@@ -28,11 +28,11 @@ export type SocketEvents = {
 };
 
 // Use for the Dynamic Url Page for Socket
-const projectStatus = 'development';
 export const getSocketUrl = () => {
-  return projectStatus === 'development'
-    ? 'http://localhost:3001'
-    : 'https://dev-launchpad-tools-game-app.onrender.com/';
+  // return projectStatus === 'development'
+  //   ? 'http://localhost:3001'
+  //   : 'https://dev-launchpad-tools-game-app.onrender.com/';
+  return import.meta.env.VITE_SOCKET_URL;
 };
 
 
