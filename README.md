@@ -48,7 +48,7 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/devlaunchpad.git
+git clone https: https://github.com/akmroyal/Dev-Launch-Pad-Tools-App.git
 cd devlaunchpad
 
 # Install dependencies
