@@ -18,7 +18,12 @@
 ## 📁 Folder Structure
 
 ```
-/src ├── assets # Images and SVGs ├── components # Reusable components ├── pages # Route-based pages ├── tools # Tool-specific folders ├── hooks # Custom hooks ├── utils # Utility functions
+/src ├── assets # Images and SVGs
+     ├── components # Reusable components
+     ├── pages # Route-based pages
+     ├── tools # Tool-specific folders
+     ├── hooks # Custom hooks
+     ├── utils # Utility functions
 ```
 
 ---
